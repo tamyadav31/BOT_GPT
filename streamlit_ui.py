@@ -480,6 +480,9 @@ def main():
                         st.session_state.messages = messages
                         if conv['mode'] == 'rag':
                             st.session_state.selected_docs = []
+                        
+                        # Set flag to switch to chat tab
+                        st.session_state.switch_to_chat = True
                         st.success(f"✅ Resumed: {conv_title}")
                         st.rerun()
         else:
@@ -491,6 +494,15 @@ def main():
     
     
     st.markdown("---")
+    
+    # Check if we need to switch to chat tab
+    if hasattr(st.session_state, 'switch_to_chat') and st.session_state.switch_to_chat:
+        st.session_state.active_tab = 0  # Chat Assistant tab
+        st.session_state.switch_to_chat = False
+    
+    # Initialize active tab if not set
+    if 'active_tab' not in st.session_state:
+        st.session_state.active_tab = 0
     
     # Enhanced navigation with tabs
     tab1, tab2, tab3, tab4 = st.tabs([
@@ -534,13 +546,15 @@ def main():
         
         # Show conversation status if resumed
         if st.session_state.current_conversation_id:
-            st.info(f"🔄 **Continuing Conversation ID: {st.session_state.current_conversation_id}** | Mode: {st.session_state.current_mode.upper()}")
-            if st.button("🆕 Start New Conversation", type="secondary"):
-                st.session_state.current_conversation_id = None
-                st.session_state.messages = []
-                st.session_state.selected_docs = []
-                st.success("✅ Started new conversation!")
-                st.rerun()
+            st.success(f"🔄 **Continuing Conversation ID: {st.session_state.current_conversation_id}** | Mode: {st.session_state.current_mode.upper()}")
+            col1, col2 = st.columns([3, 1])
+            with col2:
+                if st.button("🆕 Start New Conversation", type="secondary", use_container_width=True):
+                    st.session_state.current_conversation_id = None
+                    st.session_state.messages = []
+                    st.session_state.selected_docs = []
+                    st.success("✅ Started new conversation!")
+                    st.rerun()
         
         # Enhanced chat display
         st.markdown("### 💬 Conversation")
@@ -784,33 +798,29 @@ def main():
                             conv_title = generate_conversation_title(messages)
                             
                             with st.expander(f"💬 {conv_title} ({conv['mode'].upper()})", expanded=False):
-                                col1, col2 = st.columns([2, 1])
-                                with col1:
-                                    st.markdown(f"**ID:** {conv['id']}")
-                                    st.markdown(f"**Created:** {conv['created_at']}")
-                                    st.markdown(f"**Mode:** {conv['mode']}")
-                                    st.markdown(f"**Messages:** {len(messages)}")
+                                # Info section
+                                st.markdown(f"**ID:** {conv['id']} | **Created:** {conv['created_at']} | **Mode:** {conv['mode']} | **Messages:** {len(messages)}")
                                 
-                                with col2:
-                                    # Action buttons
-                                    col_resume, col_view, col_delete = st.columns(3)
-                                    
-                                    with col_resume:
-                                        if st.button(f"🔄 Resume", key=f"resume_{conv['id']}", use_container_width=True, type="primary"):
-                                            # Load conversation into current session
-                                            st.session_state.current_conversation_id = conv['id']
-                                            st.session_state.current_mode = conv['mode']
-                                            st.session_state.messages = messages
-                                            
-                                            # If RAG mode, load associated documents
-                                            if conv['mode'] == 'rag':
-                                                # Get documents associated with this conversation
-                                                # For now, we'll clear selected docs and let user reselect
-                                                st.session_state.selected_docs = []
-                                            
-                                            st.success(f"✅ Resumed conversation: {conv_title}")
-                                            st.info("💡 Go to the Chat Assistant tab to continue the conversation")
-                                            st.rerun()
+                                # Action buttons in one row
+                                col_resume, col_view, col_delete = st.columns(3)
+                                
+                                with col_resume:
+                                    if st.button(f"🔄 Resume", key=f"resume_{conv['id']}", use_container_width=True, type="primary"):
+                                        # Load conversation into current session
+                                        st.session_state.current_conversation_id = conv['id']
+                                        st.session_state.current_mode = conv['mode']
+                                        st.session_state.messages = messages
+                                        
+                                        # If RAG mode, load associated documents
+                                        if conv['mode'] == 'rag':
+                                            # Get documents associated with this conversation
+                                            # For now, we'll clear selected docs and let user reselect
+                                            st.session_state.selected_docs = []
+                                        
+                                        # Set flag to switch to chat tab
+                                        st.session_state.switch_to_chat = True
+                                        st.success(f"✅ Resumed conversation: {conv_title}")
+                                        st.rerun()
                                     
                                     with col_view:
                                         if st.button(f"👁️ View", key=f"view_{conv['id']}", use_container_width=True):

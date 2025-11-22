@@ -9,7 +9,7 @@ Covers:
 - Error handling and validation
 """
 import pytest
-from unittest.mock import patch, AsyncMock
+from unittest.mock import patch, MagicMock
 from sqlalchemy.orm import Session
 
 from app.db.models import User, Conversation, Message, ConversationMode
@@ -23,8 +23,8 @@ class TestStartConversation:
     def test_start_conversation_open_mode(self, mock_llm_service, db: Session, test_user):
         """Test starting a conversation in open mode."""
         # Mock LLM service
-        mock_llm = AsyncMock()
-        mock_llm.chat_completion = AsyncMock(return_value="Hello! How can I help?")
+        mock_llm = MagicMock()
+        mock_llm.chat_completion.return_value = "Hello! How can I help?"
         mock_llm_service.return_value = mock_llm
 
         service = ConversationService(db)
@@ -51,8 +51,8 @@ class TestStartConversation:
     def test_start_conversation_rag_mode(self, mock_llm_service, db: Session, test_user):
         """Test starting a conversation in RAG mode."""
         # Mock LLM service
-        mock_llm = AsyncMock()
-        mock_llm.chat_completion = AsyncMock(return_value="Based on the documents...")
+        mock_llm = MagicMock()
+        mock_llm.chat_completion.return_value = "Based on the documents..."
         mock_llm_service.return_value = mock_llm
 
         service = ConversationService(db)
@@ -150,8 +150,8 @@ class TestAddMessage:
     def test_add_message_to_conversation(self, mock_llm_service, db: Session, test_user, test_conversation):
         """Test adding a message to an existing conversation."""
         # Mock LLM service
-        mock_llm = AsyncMock()
-        mock_llm.chat_completion = AsyncMock(return_value="Response to your question")
+        mock_llm = MagicMock()
+        mock_llm.chat_completion.return_value = "Response to your question"
         mock_llm_service.return_value = mock_llm
 
         service = ConversationService(db)

@@ -406,16 +406,6 @@ This codebase has been comprehensively refined with:
 - Foreign key constraints with cascading deletes
 - Optional GPU support for FAISS
 
-## Limitations & Future Improvements
-
-- **Token Counting**: Currently uses placeholder token counting. Integrate real token counting from LLM provider
-- **Authentication**: No user authentication implemented. Add JWT or OAuth2 for production
-- **Rate Limiting**: No rate limiting. Add for production deployments
-- **Async Operations**: LLM calls are synchronous. Consider async/await for better performance
-- **File Upload**: Document upload currently accepts raw text. Add multipart file upload support
-- **Caching**: No caching layer. Consider Redis for conversation history caching
-- **Monitoring**: Add Prometheus metrics and structured logging for production
-
 ## Troubleshooting
 
 ### FAISS Index Not Found
